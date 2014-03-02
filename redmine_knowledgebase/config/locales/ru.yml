@@ -1,0 +1,69 @@
+---
+ru:
+  allow_anon_access: "Разрешить анонимный доступ?"
+  allow_sort_category_tree: "Сортировать дерево каталогов по алфавиту?"
+  field_tag_list: "Список меток"
+  knowledgebase_title: "База знаний"
+  label_article_created: "Создана статья '%{title}'"
+  label_article_plural: Статьи
+  label_article_removed: "Статья удалена"
+  label_article_updated: "Статья обновлена"
+  label_article_viewed:
+    one: "Просмотрена один раз"
+    other: "Просмотрена %{count} раз"
+  label_category: Раздел
+  label_category_created: "Создан раздел '%{title}'"
+  label_category_deleted: "Раздел удален"
+  label_category_not_empty_cannot_delete: "Раздел содержит статьи и не может быть удален."
+  label_category_plural: Разделы
+  label_category_updated: "Раздел обновлен"
+  label_content: Текст статьи
+  label_delete_article: "Удалить статью"
+  label_delete_category: "Удалить Раздел"
+  label_description: Описание
+  label_edit_article: Редактировать
+  label_edit_category: "Редактировать раздел"
+  label_jump_category: "Перейти к разделу"
+  label_kb_home: Начало
+  label_kb_link: "KB#%{kb_id}"
+  label_new_article: "Новая статья"
+  label_new_category: "Новый раздел"
+  label_new_comment: "Создать комментарий"
+  label_parent_category: "Родительский раздел"
+  label_root_category: "Корневой раздел"
+  label_subcategories: Подразделы
+  label_summary: Описание
+  label_summary_newest_articles: "Создан %{ago} в разделе %{category}"
+  label_summary_popular_articles:
+    one: "Один просмотр с %{created}"
+    other: "Было %{count} просмотров с %{created}"
+  label_summary_toprated_articles:
+    one: "Рейтинг: %{rating_avg}/%{rating_max} после одного голоса"
+    other: "Rating: %{rating_avg}/%{rating_max} после %{count} голосов"
+  label_summary_updated_articles: "Обновлено %{ago}"
+  label_title: Заголовок
+  label_title_articles: Статьи
+  label_title_category: Раздел
+  label_updated_who: "Обновлено %{updater} %{age} назад"
+  message_no_articles: "Пока что не было создано ни одной статьи в Базе Знаний. Может быть, вы захотите стать первым..."
+  message_no_categories: "Пока что категории отсутствуют. Войдите, чтобы создать новый раздел."
+  show_category_totals: "Показать все разделы в виде дерева?"
+  summary_item_limit: "Лимит количества разделов Базы Знаний"
+  title_add_comment: "Добавить комментарий"
+  title_article_rating: "Рейтинг статьи"
+  title_browse_by_category: "Просмотр по разделам"
+  title_create_article: "Создать статью"
+  title_create_category: "Создать раздел"
+  title_edit_article: "Редактировать статью"
+  title_edit_category: "Редактировать раздел"
+  title_most_popular_articles: "Наиболее популярные статьи"
+  title_new_category: "Новый раздел"
+  title_newest_articles: "Свежие статьи"
+  title_recently_updated_articles: "Недавно обновлённые статьи"
+  title_tagged_articles: "Статьи отмеченные тегом %{tag}"
+  title_tags: Тэг
+  title_top_rated_articles: "Статьи с наибольшим рейтингом"
+  title_votes:
+    one: "один голос"
+    other: "%{count} голосов"
+    zero: "голосов нет"

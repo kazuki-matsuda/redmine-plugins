@@ -1,0 +1,33 @@
+<div id="issue_templates_settings">
+<%
+@issue_templates_setting = IssueTemplateSetting.find_or_create(@project.id)
+ %>
+  <% if @project.trackers.blank? %>
+      <div class="nodata">
+        <%= simple_format(l(:text_no_tracker_enabled)) %>
+      </div>
+  <% end %>
+  <p><%= l(:about_help_message) %></p>
+<%= labelled_form_for :settings, @issue_templates_setting,
+                             :url => {:controller => 'issue_templates_settings',
+                             :action => 'edit', :project_id => @project, :tab => 'issue_templates',
+                             :setting_id => @issue_templates_setting.id}, 
+                             :html => {:id => 'issue_templates_settings' } do |f| %>    
+    <%= error_messages_for 'issue_templates_setting' %>
+    <div class="box tabular">
+    <p><%= f.check_box :enabled, :label => l(:label_show_help_message) %></p>     
+    <p><label><%=l(:label_help_message)%></label>
+   <%=content_tag(:label, l(:label_help_message)) %>
+   <%=text_area_tag 'settings[help_message]',  @issue_templates_setting['help_message'],  :size =>"50x5", 
+        :class => 'wiki-edit' ,:required => true  %><br/>
+ <%= wikitoolbar_for "settings_help_message" %>
+ <%= preview_link url_for(:controller => 'issue_templates_settings', :action => 'preview',
+                          :project_id => @project),
+                  'settings_help_message', target='template_help_preview' %>
+<div id="template_help_preview" class="wiki"></div>       
+        
+    </div>
+    <%= submit_tag l(:button_save) %>
+<% end %>
+</div>
+
