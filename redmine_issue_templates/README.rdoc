@@ -22,6 +22,8 @@ Try this:
 
 * rake db:migrate_plugins NAME=redmine_issue_templates VERSION=0 RAILS_ENV=production
 
+See also: http://www.r-labs.org/projects/issue-template/wiki/About_en#Uninstall-plugin
+
 === Required Settings
 
 1. Login to your Redmine install as an Administrator
@@ -47,7 +49,37 @@ project has some format for issues.
 
 * http://www.r-labs.org/projects/issue-template (Project Page)
 
+=== Description and usage info
+
+* http://www.r-labs.org/projects/issue-template/wiki/About_en
+
 == Changelog
+
+=== 0.0.7
+
+NOTE: Please run "rake redmine:plugins:migrate" task because new column
+  is added.
+
+* Fix some bugs.
+* Compatible with CKEditor.  (#1280)
+* Add feature to show warning message for orphaned templates. (#1278)
+* Inherited templates only should be listed which tracker is the same to 
+  child project use. (#1278)
+* Add French translation file. (Bitbucket IssueID:33)
+* Add Serbian translation. Thank you so much, Miodrag Milic. (Bitbucket IssueID:34)
+* Add option to change append or replace with template. (#1176)
+
+=== 0.0.6
+
+* Inherited templates from parent project.  (#1267)
+* Add links to template list/edit at project setting tab. (#1269)
+* Add link to erase issue subject and description text.
+* Replace :rubygems in Gemfile with 'https://rubygems.org'.
+  Thanks for JohnArcher.
+* Fixed invalid encoding. Thank you so much, Christoph. (#1178)
+* Fixed append "null" string to issue title field. (IssueID: #1268)
+* Prevent to load template when update and redirect with validation error.
+    (#1151, #1254)
 
 === 0.0.5
 
@@ -71,6 +103,9 @@ project has some format for issues.
 * Chinese: Steven Wong
 * Bulgarian: Ivan Cenov
 * Russian: Denny Brain
+* German: Terence Miller and anonymous contributor
+* French: Anonymous one
+* Serbian: Miodrag Milic 
 
 
 === License
