@@ -1,16 +1,17 @@
-# $Id$
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
+# -*- coding: utf-8 -*-
 
 require "rexml/document"
 require 'cgi'
-require 'hudson_exceptions'
 require 'date'
-
-RAILS_DEFAULT_LOGGER.info 'Starting Hudson plugin for RedMine'
+require File.join(File.dirname(__FILE__), "../models", 'hudson_exceptions')
 
 class HudsonController < ApplicationController
   unloadable
+
+  include HudsonHelper
+  include RexmlHelper
+  include ERB::Util
+
   layout 'base'
 
   before_filter :find_project
@@ -18,22 +19,18 @@ class HudsonController < ApplicationController
   before_filter :authorize
   before_filter :clear_flash
 
-  include HudsonHelper
-  include RexmlHelper
-  include ERB::Util
-
   def index
     raise HudsonNoSettingsException if @hudson.settings.new_record?
 
     @hudson.fetch if Hudson.autofetch?
-       
+
     respond_to do |format|
-      format.html { render :action => 'index', :layout => !request.xhr? }
-      format.atom { render :layout => false, :template => 'hudson/index.atom.builder', :type => 'text/xml' } 
+      format.html {render :action => 'index', :layout => !request.xhr?}
+      format.atom {render :layout => false, :template => 'hudson/index.atom.builder', :type => 'text/xml'} 
     end
     
   rescue HudsonNoSettingsException
-    flash.now[:error] = l(:notice_err_no_settings, url_for(:controller => 'hudson_settings', :action => 'edit', :id => @project))
+    flash.now[:error] = t(:notice_err_no_settings, :url => url_for(:controller => 'hudson_settings', :action => 'edit', :id => @project))
   ensure
     unless @hudson.hudson_api_errors.empty?
       flash.now[:error] << "<br>" if flash.now[:error]
@@ -46,39 +43,38 @@ class HudsonController < ApplicationController
   def build
     raise HudsonNoSettingsException if @hudson.settings.new_record?
 
-    job = @hudson.get_job(params[:name])
+    job = @hudson.jobs.find {|job| job.id == params[:job_id].to_i}
 
-    raise HudsonNoJobException if job.is_a?(HudsonNoJob)
+    raise HudsonNoJobException unless job
 
     job.request_build
 
   rescue HudsonNoSettingsException
-    render :text => "#{l(:notice_err_build_failed, :notice_err_no_settings)}"
+    render :text => "NG:#{params[:name]} #{t(:notice_err_no_settings)}"
   rescue HudsonNoJobException
-    render :text => "#{l(:notice_err_build_failed_no_job, params[:name])}"
+    render :text => "NG:#{params[:name]} #{t(:notice_err_no_job, :job_name => params[:job_id])}"
   else
     if job.hudson_api_errors.empty?
-      render :text => "#{params[:name]} #{l(:build_accepted)}"
+      render :text => "OK:#{params[:name]}"
     else
       api_error_messages = hudson_api_errors_to_messages(job.hudson_api_errors)
-      render :text => api_error_messages.join("<br>")
+      render :text => "NG:#{params[:name]} #{api_error_messages.join("<br>")}"
     end
   end
 
   def history
     raise HudsonNoSettingsException if @hudson.settings.new_record?
-    raise HudsonNoJobException unless @hudson.settings.job_include?(params[:name]) # ちょっと強引だけど、見えない設定のジョブはないものとみなす
 
-    job = @hudson.get_job(params[:name])
+    job = @hudson.jobs.find {|job| job.id == params[:job_id].to_i}
 
-    raise HudsonNoJobException if job.is_a?(HudsonNoJob)
+    raise HudsonNoJobException unless job 
 
     @builds = job.fetch_recent_builds
 
   rescue HudsonNoSettingsException
-    render :text => "#{l(:notice_err_no_settings, url_for(:controller => 'hudson_settings', :action => 'edit', :id => @project))}"
+    render :text => t(:notice_err_no_settings, :url => url_for(:controller => 'hudson_settings', :action => 'edit', :id => @project))
   rescue HudsonNoJobException
-    render :text => "#{l(:notice_err_no_job, params[:name])}"
+    render :text => t(:notice_err_no_job, :job_name => params[:job_id])
   else
     if job.hudson_api_errors.empty?
       render :partial => 'history'

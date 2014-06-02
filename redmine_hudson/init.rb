@@ -1,5 +1,4 @@
 # $Id$
-require 'dispatcher'
 require 'redmine'
 require 'hudson_application_hooks'
 require 'query_patch'
@@ -9,8 +8,8 @@ Redmine::Plugin.register :redmine_hudson do
   author 'Toshiyuki Ando r-labs'
   url "http://www.r-labs.org/repositories/show/hudson" if respond_to?(:url)
   description 'This is a Hudson plugin for Redmine'
-  version '1.0.8.1'
-  requires_redmine :version_or_higher => '1.4.0'
+  version '2.1.2'
+  requires_redmine :version_or_higher => '2.1.0'
 
   project_module :hudson do
     # パーミッション設定。
@@ -46,7 +45,8 @@ Redmine::Plugin.register :redmine_hudson do
 
 end
 
-Dispatcher.to_prepare do
-  Query.send( :include, RedmineHudson::RedmineExt::QueryPatch)
+Rails.configuration.to_prepare do
+  unless Query.included_modules.include? RedmineHudson::RedmineExt::QueryPatch
+    Query.send( :include, RedmineHudson::RedmineExt::QueryPatch)
+  end
 end
-

@@ -1,5 +1,4 @@
-# $Id$
-= Hudson Plugin 1.0.8
+= Hudson Plugin 2.1.2
 
 Redmie を Hudson と連携させるためのプラグインです。
 
@@ -15,7 +14,7 @@ Redmie を Hudson と連携させるためのプラグインです。
 Hudson側にも {Redmine用プラグイン}[http://d.hatena.ne.jp/gaooh/20090308/1236509572] があります。
 
 == 必要なもの
-* Redmine 0.8.x で動作します。
+* Redmine 2.1.0 以上で動作します。
 * Hudson 1.313 をお奨めします。
 
 == Feature
@@ -88,7 +87,7 @@ rake タスクを使って情報を取得する場合は、必ず 自動取得�
 
 [de.yml] Jens Goldhammer, Florian Bartels
 [es.yml] juancayetano.delgado
-[fr.yml] Francois-Xavier CAUVIN
+[fr.yml] Francois-Xavier CAUVIN, Fabien Crespel
 [hu.yml] Péter Major
 [it.yml] Marco Bazzani
 [ru.yml] Eugene Sirotkin.
@@ -136,11 +135,46 @@ rake タスクを使って情報を取得する場合は、必ず 自動取得�
 設定ページの履歴を削除 ボタンを使ってデータベースの内容を初期化してみてください。
 状況が改善するかもしれません。
 
+
+== テストの方法
+
+* Gemfile_for_devtest を Gemfile にする
+* RAILS_ENV=test rake redmine_hudson:db:test:prepare
+* RAILS_ENV=test rake redmine_hudson:cucumber
+
+
 == 変更履歴
 
-=== 1.0.8.1
+=== 2.1.2
 
-* ##1036 (バグ) ビルド結果と関連のあるチケットを表示するとエラーとなる
+* ##1264 (Feature) tree query parameter を使って高速化 (thanks, dborisyuk)
+* ##1184 (Feature) スライドバーに hudson へのリンクを追加
+* ##1172 (Feature) フランス語の言語ファイル更新 (thanks, Fabien Crespel)
+* ##1279 (Defect)  エラー "Undefined method `add_available_filter'" が Redmine 2.2.1 で発生する
+* ##1258 (Defect)  チケットのフィルタで Hudson プラグインに関する項目が選択できない
+* ##1257 (Defect)  gem 'simplecov' のバージョンが redmine_backlogs と衝突する
+* ##1255 (Defect)  見た目で 'Pluginオリジナル' を選択するとエラーになる
+* ##1253 (Defect)  git を利用していると、チケットに関連するビルドが表示されない
+* ##1252 (Defect)  最新の gem を使うと cucumber の実行に失敗する
+* ##1212 (Defect)  いくつかの gem のバージョンが Redmine 2.3.0 と衝突する
+* ##1188 (Defect)  ジョブを選択して保存すると、internal error が発生する (thanks, NAITHO and Akiko Takano)
+
+
+=== 2.1.1
+
+* ##1162 (提案) redmine_hudson plugin Gemfile のグループ名を test にしてほしい 
+* ##1160 (バグ) ruby1.8.7 で "rake db:migrate_plugins RAILS_ENV=production" が失敗する
+* ##1157 (バグ) gem 'simplecov' のバージョンが code review plugin と競合を起こす
+
+
+=== 2.1.0
+
+* ##1153 (バグ) いくつかの言語ファイルのフォーマットが古いまま
+* ##1147 (バグ) plugin assets のルーティングでエラーが発生する
+* ##1128 (提案) gem が backlogs と競合する
+* ##1121 (バグ) Redmine 2.1.2 - Redmine_Hudson plugin 2.00 - ActionView::Template::Error (undefined method `auth_user' for #<HudsonSettings
+* ##1118 (機能) Redmine2.1.x をサポートする
+
 
 === 1.0.8
 

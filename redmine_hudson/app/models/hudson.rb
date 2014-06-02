@@ -1,7 +1,7 @@
-# $Id$
+# -*- coding: utf-8 -*-
 
-require 'hudson_api_error'
-require 'hudson_exceptions'
+require File.join( File.dirname(__FILE__), 'hudson_api_error' )
+require File.join( File.dirname(__FILE__), 'hudson_exceptions' )
 
 class Hudson
   unloadable
@@ -18,12 +18,19 @@ class Hudson
     return "#{@settings.url_for(type)}api"
   end
 
-def initialize(project_id)
+  def initialize(project_id)
     @project_id = project_id
     @project = Project.find(project_id)
     @settings = HudsonSettings.find_by_project_id(@project_id)
     find_jobs
     clear_hudson_api_errors
+  end
+
+  def ci_server_name
+    return "" if @settings.url_for(:plugin).blank?
+    return HudsonApi.ci_server_name(@settings.url_for(:plugin), 
+                                    @settings.auth_user, 
+                                    @settings.auth_password)
   end
 
   def fetch
@@ -37,12 +44,13 @@ def initialize(project_id)
     return unless @hudson_api_errors.empty?
 
     fetch_buildresults
+
   rescue HudsonApiException => error
     @hudson_api_errors << HudsonApiError.new(self.class.name, "fetch", error)
   end
 
   def get_job(job_name)
-      job = self.jobs.find{|job| job.name == job_name }
+      job = self.jobs.find{|job| job.name == job_name}
       return HudsonNoJob.new(:name => job_name, :settings => @settings) unless job
       return job
   end
@@ -65,16 +73,7 @@ private
   def fetch_jobs
     content = ""
     begin
-    # job/build, view, primaryView は省く
-    api_url = "#{api_url_for(:plugin)}/xml?depth=1" +
-              "&xpath=/hudson" +
-              "&exclude=/hudson/view" +
-              "&exclude=/hudson/primaryView" +
-              "&exclude=/hudson/job/build" +
-              "&exclude=/hudson/job/lastCompletedBuild" +
-              "&exclude=/hudson/job/lastStableBuild" +
-              "&exclude=/hudson/job/lastSuccessfulBuild"
-    content = open_hudson_api(api_url, @settings.auth_user, @settings.auth_password)
+      content = HudsonApi.get_job_details(self.api_url_for(:plugin), @settings.auth_user, @settings.auth_password) 
     rescue HudsonApiException => error
       raise error
     end

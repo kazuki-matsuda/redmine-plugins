@@ -1,34 +1,8 @@
-# $Id$
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
+# -*- coding: utf-8 -*-
 
-require "uri"
-require 'net/http'
+require File.join( File.dirname(__FILE__), "..", "models", 'hudson_exceptions' )
 
 module HudsonHelper
-
-  def open_hudson_api( uri, auth_user, auth_password )
-
-    begin
-      http = create_http_connection(uri)
-      request = create_http_request(uri, auth_user, auth_password)
-    rescue => error
-      raise HudsonApiException.new(error)
-    end
-
-    begin
-      response = http.request(request)
-    rescue Timeout::Error, StandardError => error
-      raise HudsonApiException.new(error)
-    end
-
-    case response
-    when Net::HTTPSuccess, Net::HTTPFound
-      return response.body
-    else
-      raise HudsonApiException.new(response)
-    end
-  end
 
   def check_box_to_boolean(item)
     return false unless item
@@ -47,39 +21,21 @@ module HudsonHelper
     return today.strftime("%Y/%m/%d") == value_time.strftime("%Y/%m/%d")
   end
 
-  def create_http_connection(uri)
+  def url_for_ci_server_persona(hudson)
+    return "" if hudson.settings.url.blank?
 
-    param = URI.parse( URI.escape(uri) )
-
-    if "https" == param.scheme then
-      param.port = 443 if param.port == nil || param.port == ""
+    ci_server_name = ""
+    begin
+      ci_server_name = hudson.ci_server_name
+    rescue HudsonApiException => e
+      # ignore error
     end
 
-    retval = Net::HTTP.new(param.host, param.port)
+    return "" if ci_server_name.blank?
 
-    if "https" == param.scheme then
-      retval.use_ssl = true
-      retval.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    end
-    
-    return retval
-
+    "#{hudson.settings.url}images/#{ci_server_name}.png"
   end
 
-  def create_http_request(uri, auth_user, auth_password)
-    
-    param = URI.parse( URI.escape(uri) )
-
-    getpath = param.path
-    getpath += "?" + param.query if param.query != nil && param.query.length > 0
-
-    retval = Net::HTTP::Get.new(getpath)
-    retval.basic_auth(auth_user, auth_password) if auth_user != nil && auth_user.length > 0
-
-    return retval
-
-  end
-  
   def generate_atom_content(job)
     tag = ""
     tag = job.latest_build.error if "" != job.latest_build.error
@@ -97,11 +53,11 @@ module HudsonHelper
         tag << content_tag("span", job.latest_build.result, 
                :class => "result #{job.latest_build.result.downcase}") if true != job.latest_build.building? && "" != job.latest_build.result
         tag " " 
-        tag << content_tag("span", l(:notice_building), :class => "result") if job.latest_build.building?
+        tag << content_tag("span", t(:notice_building), :class => "result") if job.latest_build.building?
         tag << " "
         tag << content_tag("span", job.latest_build.finished_at.localtime.strftime("%Y/%m/%d %H:%M:%S"))
       end
-      tag << l(:notice_no_builds) if "" == job.latest_build.number
+      tag << t(:notice_no_builds) if "" == job.latest_build.number
     end    
   
     tag << "<ul class=\"job-health-reports\">"

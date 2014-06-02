@@ -1,12 +1,18 @@
-# $Id$
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
+# -*- coding: utf-8 -*-
 
 require "rexml/document"
-require 'hudson_exceptions'
+require File.join(File.dirname(__FILE__), "../models", 'hudson_exceptions')
+
+class HudsonApiException < Exception
+
+end
 
 class HudsonSettingsController < ApplicationController
   unloadable
+
+  include RexmlHelper
+  include HudsonHelper
+
   layout 'base'
 
   before_filter :find_project
@@ -14,21 +20,13 @@ class HudsonSettingsController < ApplicationController
   before_filter :authorize
   before_filter :clear_flash
 
-  include RexmlHelper
-  include HudsonHelper
-
   def edit
-    if (params[:settings] != nil)
+    if (params[:hudson_settings] != nil)
+
       @hudson.settings.project_id = @project.id
-      @hudson.settings.url = HudsonSettings.add_last_slash_to_url(params[:settings].fetch(:url))
-      @hudson.settings.url_for_plugin = ""
-      @hudson.settings.url_for_plugin = HudsonSettings.add_last_slash_to_url(params[:settings].fetch(:url_for_plugin)) if ( check_box_to_boolean(params[:enable_url_for_plugin]) )
-      @hudson.settings.job_filter = HudsonSettings.to_value(params[:settings].fetch(:jobs))
-      @hudson.settings.auth_user = params[:settings].fetch(:auth_user)
-      @hudson.settings.auth_password = params[:settings].fetch(:auth_password)
-      @hudson.settings.get_build_details = check_box_to_boolean(params[:settings][:get_build_details])
-      @hudson.settings.show_compact = check_box_to_boolean(params[:settings][:show_compact])
-      @hudson.settings.look_and_feel = params[:settings].fetch(:look_and_feel)
+      @hudson.settings.attributes = params[:hudson_settings]
+
+      @hudson.settings.url_for_plugin = "" unless ( check_box_to_boolean(params[:enable_url_for_plugin]) )
 
       success_to_save = @hudson.settings.save
 
@@ -38,7 +36,7 @@ class HudsonSettingsController < ApplicationController
         add_job
         update_job_settings params
         find_hudson # 一度設定を読み直さないと、destory したものが残るので ( delete_if の方が分かりやすい？ )
-        flash[:notice] = l(:notice_successful_update)
+        flash[:notice] = t :notice_successful_update
       end
 
     end
@@ -47,7 +45,8 @@ class HudsonSettingsController < ApplicationController
     find_hudson_jobs
 
   rescue HudsonApiException => error
-    flash.now[:error] = error.message
+    # Unescaped message can be returned in case sucn as REXML::ParseException, so escape is required....
+    flash.now[:error] = ERB::Util.html_escape(error.message)
   end
 
   def joblist
@@ -55,15 +54,15 @@ class HudsonSettingsController < ApplicationController
       # この find は、外部のサーバ(Hudson)にアクセスするので、before_filter には入れない
       # ジョブの一覧を取得するためだけなので、設定に一時値は反映するけれど、保存はしない
       @hudson.settings = HudsonSettings.new unless @hudson.settings
-      @hudson.settings.url = HudsonSettings.add_last_slash_to_url(params[:url])
+      @hudson.settings.url = params[:url]
       @hudson.settings.url_for_plugin = ""
-      @hudson.settings.url_for_plugin = HudsonSettings.add_last_slash_to_url(params[:url_for_plugin]) if ( check_box_to_boolean(params[:enable_url_for_plugin]) )
+      @hudson.settings.url_for_plugin = params[:url_for_plugin] if ( check_box_to_boolean(params[:enable_url_for_plugin]) )
 
       find_hudson_jobs
     rescue HudsonApiException => error
       @error = error.message
     end
-    render :layout => false, :template => 'hudson_settings/_joblist.rhtml'
+    render :layout => false, :template => 'hudson_settings/_joblist'
   end
 
   def delete_builds
@@ -78,7 +77,7 @@ class HudsonSettingsController < ApplicationController
   rescue => error
     @error = error.message
   ensure
-    render :layout => false, :template => 'hudson_settings/_joblist.rhtml'
+    render :layout => false, :template => 'hudson_settings/_joblist'
   end
 
   def delete_history
@@ -91,7 +90,7 @@ class HudsonSettingsController < ApplicationController
       end
     }
 
-    flash[:notice] = l(:notice_successful_delete)
+    flash[:notice] = t :notice_successful_delete 
   rescue Exception => error
     flash[:error] = error.message
   ensure
@@ -121,16 +120,18 @@ private
   def find_hudson_jobs()
     @jobs = []
 
-    api_url = @hudson.api_url_for(:plugin)
-    return if api_url == nil || api_url.length == 0
+    begin
+      api_url = @hudson.api_url_for(:plugin)
+      return if api_url == nil || api_url.length == 0
 
-    api_url = "#{api_url}/xml?depth=0"
-
-    # Open the feed and parse it
-    content = open_hudson_api(api_url, @hudson.settings.auth_user, @hudson.settings.auth_password)
-    doc = REXML::Document.new content
-    doc.elements.each("hudson/job") do |element|
-      @jobs << get_element_value(element, "name")
+      # Open the feed and parse it
+      content = HudsonApi.get_job_list(api_url, @hudson.settings.auth_user, @hudson.settings.auth_password)
+      doc = REXML::Document.new content
+      doc.elements.each("hudson/job") do |element|
+        @jobs << get_element_value(element, "name")
+      end
+    rescue => e
+      raise HudsonApiException.new(e)
     end
   end
 
@@ -164,7 +165,7 @@ private
 
     return unless params[:new_health_report_settings]
 
-    params[:new_health_report_settings].each do |id, hrs|
+    params[:new_health_report_settings].each do |hrs|
       next if HudsonSettingsHealthReport.is_blank?(hrs)
       @hudson.settings.health_report_settings << HudsonSettingsHealthReport.new(hrs)
     end
@@ -177,7 +178,7 @@ private
   end
 
   def add_job
-    HudsonSettings.to_array(@hudson.settings.job_filter).each do |job_name|
+    @hudson.settings.jobs.each do |job_name|
       next if @hudson.get_job(job_name).is_a?(HudsonJob)
       job = @hudson.add_job(job_name)
       job.save!

@@ -1,4 +1,3 @@
-# $Id$
 # English strings go here
 en:
   label_hudson: Hudson
@@ -13,14 +12,12 @@ en:
   label_update_jobs: Update Jobs
   label_build_now: Build Now
   label_show_build_history: Show Build History
+  label_show_build_artifacts: Show Build Artifacts
   label_show_compact: Show Compact
   label_health_report_build_stability: HealthReport:BuildStability
   label_health_report_test_result: HealthReport:TestResult
   label_database: DataBase
   label_get_build_details: Get Build Details (changesets and test-results)
-  label_look_and_feel: Look and Feel (only icons)
-  label_look_and_feel_hudson: Hudson
-  label_look_and_feel_plugin: Plugin original
   label_add_health_report: Add HealthReport Setting
   label_health_report: Health Report
   label_health_report_settings: Health Report Settings
@@ -37,6 +34,7 @@ en:
   label_query_limit_builds_each_job: Max Number of Builds for query (Using search issues)
   label_query_limit_changesets_each_job: Max Number of Changesets for query (Using search issues)
   label_use_url_for_plugin: Plugin uses below url for access to hudson. Don't use above. ( for user )
+  label_hudson_server: Server 
 
   field_hudson_job: Hudson(Job)
   field_hudson_build: Hudson(BuildNumber)
@@ -47,23 +45,24 @@ en:
   notice_no_builds: No Builds
 
   notice_building: Now Building...
+  notice_build_accepted: Build Accepted.
   notice_hudson_url: 'with http://, https:// ...'
   notice_get_build_details: Take the checkmark off, if take a lot of time.
   notice_health_report: Provide a link to Hudson, if plugin find keyword in Health Report.
   notice_health_report_setting: 'If plugin find keyword - ${keyword} in HealthReport, Provide a link to Hudson - ${url_format}'
   notice_autofetch: Fetch information from Hudson during action 'index'. <br> You can call rake-task "redmine_hudson:fetch" by an external script.
 
-  notice_err_cant_connect: "Can't Connect Hudson {{value}}"
-  notice_err_response_invalid: 'Response Invalid {{value}}'
-  notice_err_http_error: 'Http Error {{value}}'
-  notice_err_no_settings: "No settings for this project. Please <a href='{{value}}'>confirm settings</a>"
+  notice_err_cant_connect: "Can't Connect Hudson %{description}"
+  notice_err_response_invalid: 'Response Invalid %{description}'
+  notice_err_http_error: 'Http Error result code:%{code} message:%{message}'
+  notice_err_no_settings: "No settings for this project. Please <a href='%{url}'>confirm settings</a>"
   notice_err_no_jobs: Hudson has no job
   notice_err_invalid_url: Invalid URL
-  notice_err_no_job : 'job not found [{{value}}]'
-  notice_err_unknown: 'Unknown Error {{value}}'
+  notice_err_no_job : 'job not found [%{job_name}]'
+  notice_err_unknown: 'Unknown Error %{description}'
 
-  notice_err_build_failed: 'Build failed {{value}}'
-  notice_err_build_failed_no_job: 'Build failed. Job not found [{{value}}]'
+  notice_err_build_failed: 'Build failed.'
+  notice_err_build_failed_no_job: 'Build failed. Job not found [%{job_name}]'
 
   permission_view_hudson: View Hudson
   permission_build_hudson: Build Hudson

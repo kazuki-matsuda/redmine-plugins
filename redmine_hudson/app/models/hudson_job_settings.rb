@@ -1,15 +1,15 @@
-# $Id$
+# -*- coding: utf-8 -*-
 
 class HudsonJobSettings < ActiveRecord::Base
   unloadable
+
+  include RexmlHelper
+  include HudsonHelper
 
   belongs_to :job, :class_name => 'HudsonJob', :foreign_key => 'hudson_job_id'
 
   # 空白を許さないもの
   validates_presence_of :hudson_job_id
-
-  include RexmlHelper
-  include HudsonHelper
 
   def initialize(attributes = nil)
     super attributes
@@ -30,7 +30,7 @@ class HudsonJobSettings < ActiveRecord::Base
     return unless self.job.settings
 
     api_uri = "#{job.config_url_for(:plugin)}"
-    content = open_hudson_api(api_uri, self.job.settings.auth_user, self.job.settings.auth_password)
+    content = HudsonApi.open(api_uri, self.job.settings.auth_user, self.job.settings.auth_password)
 
     doc = REXML::Document.new content
 

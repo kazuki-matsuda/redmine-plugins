@@ -1,5 +1,4 @@
-# $Id$
-= Hudson Plugin 1.0.8
+= Hudson Plugin 2.1.2
 
 This is a plugin collaborates with Hudson for Redmine.
 
@@ -11,7 +10,7 @@ Easy install configuration, and good ui.
 More detail {Meet Hudson}[http://wiki.hudson-ci.org/display/HUDSON/Meet+Hudson]
 
 == Requirements
-* Require Redmine 0.8.x.
+* Require Redmine 2.1.0 higher.
 * Recommend Hudson 1.313.
 
 == Feature
@@ -87,7 +86,7 @@ Go  Administration -> Plugins -> 'Redmine Hudson Plugin' Configure.
 
 [de.yml] Jens Goldhammer, Florian Bartels
 [es.yml] juancayetano.delgado
-[fr.yml] Francois-Xavier CAUVIN
+[fr.yml] Francois-Xavier CAUVIN, Fabien Crespel
 [hu.yml] Péter Major
 [it.yml] Marco Bazzani
 [ru.yml] Eugene Sirotkin.
@@ -139,11 +138,45 @@ Hopefully i fix it.
 you should try to delete data from database.
 Use 'delete history' button in setting page.
 
+== How to Test
+
+* rename Gemfile_for_devtest to Gemfile
+* RAILS_ENV=test rake redmine_hudson:db:test:prepare
+* RAILS_ENV=test rake redmine_hudson:cucumber
+
+
 == Changelog
 
-=== 1.0.8.1
+=== 2.1.2
 
-* ##1036 Error when issue details with related commits in Redmine 1.4.x and Hudson Plugin 1.0.8 
+* ##1264 (Feature) use tree query parameter when plugin uses hudson api. (thanks, dborisyuk)
+* ##1184 (Feature) [Patch] Add link to hudson server in sidebar
+* ##1172 (Feature) French translation update for v2.1.1 (thanks, Fabien Crespel)
+* ##1279 (Defect)  Undefined method `add_available_filter' error with Redmine 2.2.1
+* ##1258 (Defect)  no issue filter item for hudson.
+* ##1257 (Defect)  gem 'simplecov' version is conflicted with redmine_backlogs
+* ##1255 (Defect)  plugin occurred error, when i choosed 'Plugin' from "look and feel"
+* ##1253 (Defect)  Plugin can't show build result on issue page, when project uses git
+* ##1252 (Defect)  cucumber failed, when i used latest gems.
+* ##1212 (Defect)  Gemfile conflicts with Redmine 2.3.0
+* ##1188 (Defect)  occurred internal error, when select jobs and save settings. (thanks, NAITHO and Akiko Takano)
+
+
+=== 2.1.1
+
+* ##1162 (Proposal) redmine_hudson plugin Gemfile setting
+* ##1160 (Defect) rake aborted! at "rake db:migrate_plugins RAILS_ENV=production" on ruby1.8.7
+* ##1157 (Defect) gem 'simplecov' version is conflicted with code review plugin
+
+
+=== 2.1.0
+
+* ##1153 (Defect) some language file uses old format.
+* ##1147 (Defect) RoutingErrors for plugin assets.
+* ##1128 (Proposal) Resolve conflict with backlogs
+* ##1121 (Defect) Redmine 2.1.2 - Redmine_Hudson plugin 2.00 - ActionView::Template::Error (undefined method `auth_user' for #<HudsonSettings
+* ##1118 (Feature) Support Redmine2.1.x
+
 
 === 1.0.8
 

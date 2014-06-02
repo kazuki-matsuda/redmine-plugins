@@ -3,11 +3,17 @@ require 'redmine/version'
 module RedmineHudson
   module RedmineExt
 
+    def RedmineExt.redmine_090_or_higher?
+      return !(Redmine::VERSION::MAJOR == 0 && Redmine::VERSION::MINOR < 9)
+    end
+
     module QueryPatch
       def self.included(base) # :nodoc:
         base.extend(ClassMethods)
 
         base.send(:include, InstanceMethods)
+        base.send(:include, InstanceMethodsFor09Later) if RedmineHudson::RedmineExt.redmine_090_or_higher?
+        base.send(:include, InstanceMethodsFor08) unless RedmineHudson::RedmineExt.redmine_090_or_higher?
 
         # Same as typing in the class
         base.class_eval do
@@ -49,7 +55,13 @@ module RedmineHudson
         hudson_filters
 
         @hudson_filters.each do |filter|
-          @available_filters[filter.name] = filter.available_values
+
+          filter.available_values[:name] = I18n.t("field_#{filter.name}")
+          if self.respond_to?(:add_available_filter)
+            add_available_filter filter.name, filter.available_values
+          else
+            @available_filters[filter.name] = filter.available_values
+          end
         end
         return @available_filters
       end
@@ -199,6 +211,9 @@ module RedmineHudson
 
       end
 
+    end #InstanceMethods
+
+    module InstanceMethodsFor09Later
       def sql_for_field_with_redmine_hudson(field, operator, value, db_table, db_field, is_custom_filter=false)
         case field
         when "hudson_build"
@@ -212,6 +227,22 @@ module RedmineHudson
         end
       end
     end #InstanceMethodsFor09Later
+
+    module InstanceMethodsFor08
+      def sql_for_field_with_redmine_hudson(field, value, db_table, db_field, is_custom_filter)
+        operator = operator_for field
+        case field
+        when "hudson_build"
+          return sql_for_hudson_build(field, operator, value)
+
+        when "hudson_job"
+          return sql_for_hudson_job(field, operator, value)
+
+        else
+           return sql_for_field_without_redmine_hudson(field, value, db_table, db_field, is_custom_filter)
+        end
+      end
+    end #InstanceMethodsFor08
 
   end #RedmineExt
 end #RedmineHudson

@@ -1,18 +1,50 @@
-# $Id$
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
+# coding: utf-8
 
 class HudsonSettings < ActiveRecord::Base
   unloadable
+
+  include I18n
+  
   has_many :health_report_settings, :class_name => 'HudsonSettingsHealthReport', :dependent => :destroy
 
-  # 空白を許さないもの
-  validates_presence_of :project_id, :url
+  attr_accessible :url, :url_for_plugin, :auth_user, :auth_password
+  attr_accessible :get_build_details, :get_build_details, :show_compact
+  attr_accessible :jobs
 
-  # 重複を許さないもの
+  validates_presence_of   :project_id, :url
   validates_uniqueness_of :project_id
 
   DELIMITER = ','
+
+  @@HUMANIZED_ATTRIBUTE_KEY_NAMES = {
+    "health_report_settings" => I18n.t(:label_health_report_settings)
+  }
+
+  def self.human_attribute_name(attribute_key_name)
+    @@HUMANIZED_ATTRIBUTE_KEY_NAMES[attribute_key_name] || super
+  end
+
+  def self.find_by_project_id(project_id)
+    retval = HudsonSettings.find(:first,  :conditions => "project_id = #{project_id}")
+    retval = HudsonSettings.new() if retval == nil
+    return retval
+  end
+
+  def url=(value)
+    write_attribute :url, add_last_slash(value)
+  end
+
+  def url_for_plugin=(value)
+    write_attribute :url_for_plugin, add_last_slash(value)
+  end
+
+  def jobs=(value)
+    write_attribute :job_filter, to_value(value)
+  end
+
+  def jobs
+    to_array(read_attribute(:job_filter))
+  end
 
   def use_authentication?
     return false unless self.auth_user
@@ -22,7 +54,7 @@ class HudsonSettings < ActiveRecord::Base
 
   def job_include?(other)
     return false if self.job_filter == nil
-    value = HudsonSettings.to_array( self.job_filter )
+    value = to_array( self.job_filter )
     return value.include?(other.to_s)
   end
 
@@ -31,37 +63,23 @@ class HudsonSettings < ActiveRecord::Base
     return self.url
   end
 
-  # エラーメッセージに表示されるbegin, end を日本語名にするために追加。
-  @@HUMANIZED_ATTRIBUTE_KEY_NAMES = {
-    "health_report_settings" => l(:label_health_report_settings)
-  }
-
-  # attribute_key_name を人が分かる言葉にするためのメソッド。ActiveRecord がそもそも持っているものをカスタマイズ
-  def HudsonSettings.human_attribute_name(attribute_key_name)
-    @@HUMANIZED_ATTRIBUTE_KEY_NAMES[attribute_key_name] || super
+  def add_last_slash(value)
+    added = value
+    return "" unless added
+    return "" if added.length == 0
+    added += "/" unless added.index(/\/$/)
+    return added
   end
+
+  def to_value(value)
+    return "" if value == nil
+    return value.join(HudsonSettings::DELIMITER)
+  end
+
+  def to_array(value)
+    return [] if value == nil
+    return value.split(HudsonSettings::DELIMITER)
+  end
+
 end
 
-def HudsonSettings.add_last_slash_to_url(url)
-  retval = url
-  return "" unless retval
-  return "" if retval.length == 0
-  retval += "/" unless retval.index(/\/$/)
-  return retval
-end
-
-def HudsonSettings.find_by_project_id(project_id)
-  retval = HudsonSettings.find(:first,  :conditions => "project_id = #{project_id}")
-  retval = HudsonSettings.new() if retval == nil
-  return retval
-end
-
-def HudsonSettings.to_array(value)
-  return [] if value == nil
-  return value.split(HudsonSettings::DELIMITER)
-end
-
-def HudsonSettings.to_value(value)
-  return "" if value == nil
-  return value.join(HudsonSettings::DELIMITER)
-end

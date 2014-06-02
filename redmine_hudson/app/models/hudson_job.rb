@@ -1,11 +1,15 @@
-# $Id$
+# -*- coding: utf-8 -*-
 
-require 'hudson_build'
-require 'hudson_api_error'
-require 'hudson_exceptions'
+require File.join( File.dirname( __FILE__ ), 'hudson_build' )
+require File.join( File.dirname( __FILE__ ), 'hudson_api_error' )
+require File.join( File.dirname( __FILE__ ), 'hudson_exceptions' )
 
 class HudsonJob < ActiveRecord::Base
   unloadable
+
+  include HudsonHelper
+  include RexmlHelper
+
   has_many :health_reports, :class_name => 'HudsonHealthReport', :dependent => :destroy
   has_one :job_settings, :class_name => 'HudsonJobSettings', :dependent => :destroy
   belongs_to :project, :foreign_key => 'project_id'
@@ -15,9 +19,6 @@ class HudsonJob < ActiveRecord::Base
 
   # 空白を許さないもの
   validates_presence_of :project_id, :hudson_id, :name
-
-  include HudsonHelper
-  include RexmlHelper
 
   def initialize(attributes = nil)
     super attributes
@@ -111,7 +112,7 @@ class HudsonJob < ActiveRecord::Base
   def request_build
     clear_hudson_api_errors
     api_url = build_url_for(:plugin)
-    open_hudson_api(api_url, self.settings.auth_user, self.settings.auth_password)
+    HudsonApi.request_build(api_url, self.settings.auth_user, self.settings.auth_password)
   rescue HudsonApiException => error
     @hudson_api_errors << HudsonApiError.new(self.class.name, "request_build '#{self.name}'", error)
   end
@@ -119,7 +120,7 @@ class HudsonJob < ActiveRecord::Base
   def fetch_recent_builds
     clear_hudson_api_errors
     api_uri = rss_url_for(:plugin)
-    content = open_hudson_api(api_uri, self.settings.auth_user, self.settings.auth_password)
+    content = HudsonApi.get_recent_builds(api_uri, self.settings.auth_user, self.settings.auth_password)
 
     doc = REXML::Document.new content
     retval = []
@@ -137,8 +138,11 @@ class HudsonJob < ActiveRecord::Base
     
     return unless do_fetch?
 
-    fetch_summary unless self.settings.get_build_details
-    fetch_detail if self.settings.get_build_details
+    if self.settings.get_build_details
+      fetch_detail
+    else
+      fetch_summary
+    end
 
     latest_build = get_build(self.latest_build_number)
     add_latest_build if latest_build.is_a? HudsonNoBuild
@@ -155,7 +159,7 @@ private
   def fetch_summary
     api_url = rss_url_for(:plugin)
     begin
-      content = open_hudson_api(api_url, self.settings.auth_user, self.settings.auth_password)
+      content = HudsonApi.get_recent_builds(api_url, self.settings.auth_user, self.settings.auth_password)
     rescue HudsonApiException => error
       raise error
     end
@@ -181,23 +185,9 @@ private
 
   def fetch_detail
 
-    api_url = "#{api_url_for(:plugin)}/xml/?depth=1"
-    api_url << "&exclude=//build/changeSet/item/path"
-    api_url << "&exclude=//build/changeSet/item/addedPath"
-    api_url << "&exclude=//build/changeSet/item/modifiedPath"
-    api_url << "&exclude=//build/changeSet/item/deletedPath"
-    api_url << "&exclude=//build/culprit"
-    api_url << "&exclude=//module"
-    api_url << "&exclude=//firstBuild&exclude=//lastBuild"
-    api_url << "&exclude=//lastCompletedBuild"
-    api_url << "&exclude=//lastFailedBuild"
-    api_url << "&exclude=//lastStableBuild"
-    api_url << "&exclude=//lastSuccessfulBuild"
-    api_url << "&exclude=//downstreamProject"
-    api_url << "&exclude=//upstreamProject"
     content = ""
     begin
-      content = open_hudson_api(api_url, self.settings.auth_user, self.settings.auth_password)
+      content = HudsonApi.get_build_results(self.api_url_for(:plugin), self.settings.auth_user, self.settings.auth_password)
     rescue HudsonApiException => error
       raise error
     end
