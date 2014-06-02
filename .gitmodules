@@ -1,0 +1,3 @@
+[submodule "redmine_hipchat"]
+	path = redmine_hipchat
+	url = git@github.com:hipchat/redmine_hipchat.git
