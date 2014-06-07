@@ -1,13 +1,13 @@
 # for Redmine-Trunk Japanise strings go here
 ja:
-  label_hudson: Hudson
-  label_hudson_plural: Hudson
+  label_hudson: Jenkins
+  label_hudson_plural: Jenkins
   label_build: ビルド
   label_latest_build: 最新のビルド
   label_job_list: ジョブの一覧
   label_settings: 設定
   label_url: URL
-  label_url_for_plugin: HudsonプラグインがアクセスするURL
+  label_url_for_plugin: JenkinsプラグインがアクセスするURL
   label_jobs: 表示するジョブ
   label_build_history: ビルド履歴
   label_update_jobs: ジョブの一覧を更新する
