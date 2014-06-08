@@ -35,10 +35,10 @@ ja:
   label_query_limit_builds_each_job: ジョブごとに追跡するチェンジセットの件数（チケットの検索で利用します）
   label_query_limit_changesets_each_job: ジョブごとに追跡するチェンジセットの件数（チケットの検索で利用します）
   label_use_url_for_plugin: プラグインからアクセスする場合は、上記と異なるURLを使います。
-  label_hudson_server: サーバ
+  label_hudson_server: Jenkinsサーバ
 
-  field_hudson_job: Hudson(ジョブ名)
-  field_hudson_build: Hudson(Build番号)
+  field_hudson_job: Jenkins(ジョブ名)
+  field_hudson_build: Jenkins(Build番号)
 
   button_delete_history: 履歴を削除
 
@@ -49,15 +49,15 @@ ja:
   notice_build_accepted: ビルドを受け付けました。
   notice_hudson_url: 'http://, https:// から記述してください'
   notice_get_build_details: 表示に時間がかかる場合は、チェックを外してください
-  notice_health_report: ヘルスレポートの中に指定した文字を見つけたら、Hudson へのリンクを作成します
-  notice_health_report_setting: 'ヘルスレポートの中に ${keyword} を見つけたら, Hudson へのリンク ${url_format} を作成します'
+  notice_health_report: ヘルスレポートの中に指定した文字を見つけたら、Jenkins へのリンクを作成します
+  notice_health_report_setting: 'ヘルスレポートの中に ${keyword} を見つけたら, Jenkins へのリンク ${url_format} を作成します'
   notice_autofetch: アクション 'index' の中で最新の情報を取得します。<br> 定期的に情報を取得したい場合は rake タスク "redmine_hudson:fetch" を使ってください。
 
-  notice_err_cant_connect: "Hudson に接続できませんでした（Hudson が起動していないかもしれません） %{description}"
-  notice_err_response_invalid: 'Hudson からの応答が何か変です。 %{description}'
-  notice_err_http_error: 'Hudson からエラーが返って来ました。 result code:%{code} message:%{message}'
+  notice_err_cant_connect: "Jenkins に接続できませんでした（Jenkins が起動していないかもしれません） %{description}"
+  notice_err_response_invalid: 'Jenkins からの応答が何か変です。 %{description}'
+  notice_err_http_error: 'Jenkins からエラーが返って来ました。 result code:%{code} message:%{message}'
   notice_err_no_settings: このプロジェクトの設定が見当たりません。<a href='%{url}'>設定を確認</a>してください。
-  notice_err_no_jobs: URLが設定されていないか、HudsonにJobが登録されていません。
+  notice_err_no_jobs: URLが設定されていないか、JenkinsにJobが登録されていません。
   notice_err_invalid_url: URLに誤りがあるようです。
   notice_err_no_job : 'Jobが見当たりません。[%{job_name}]'
   notice_err_unknown: 'エラーが発生しました。%{description}'
@@ -65,6 +65,6 @@ ja:
   notice_err_build_failed: 'ビルドに失敗しました。'
   notice_err_build_failed_no_job: 'ビルドに失敗しました。Jobが見当たりません。[%{job_name}]'
 
-  permission_view_hudson: Hudsonの閲覧
-  permission_build_hudson: Hudsonのビルド
-  permission_edit_hudson_settings: Hudsonの管理
+  permission_view_hudson: Jenkinsの閲覧
+  permission_build_hudson: Jenkinsのビルド
+  permission_edit_hudson_settings: Jenkinsの管理
